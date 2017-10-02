@@ -28,8 +28,7 @@ public class TransactionService {
 	private TransactionRepository transactionRepository;
 
 	@Autowired
-	public TransactionService(AccountService accountService,
-			TransactionRepository transactionRepository) {
+	public TransactionService(AccountService accountService, TransactionRepository transactionRepository) {
 		this.accountService = accountService;
 		this.transactionRepository = transactionRepository;
 	}
@@ -43,17 +42,38 @@ public class TransactionService {
 	 *            the pageable object
 	 * @return
 	 */
-	public Page<TransactionResponse> getTransactionsByAccount(String accountId,
-			Pageable p) {
+	public Page<TransactionResponse> getTransactionsByAccount(String accountId, Pageable p) {
 		if (!accountService.isAccountExist(accountId)) {
-			throw new ServiceException(ErrorCode.INVALID_ACCOUNT,
-					"Account doesn't exist");
+			throw new ServiceException(ErrorCode.INVALID_ACCOUNT, "Account doesn't exist");
 		}
-		return new PageImpl<TransactionResponse>(transactionRepository
-				.getTransactionsByAccount(accountId, p).getContent().stream()
-				.map(this::map).collect(Collectors.toList()));
+		return new PageImpl<TransactionResponse>(transactionRepository.getTransactionsByAccount(accountId, p)
+				.getContent().stream().map(this::map).collect(Collectors.toList()));
 	}
 
+	/**
+	 * Check if a transaction exists
+	 * 
+	 * @param transactionId
+	 *            the transaction id
+	 * @return true if the transaction exists
+	 */
+	public boolean isTransactionExist(String transactionId) {
+		return transactionRepository.exists(transactionId);
+	}
+
+	/**
+	 * Check if a transaction is associated to an account
+	 * 
+	 * @param transactionId
+	 *            the transaction id
+	 * @param accountId
+	 *            the account id
+	 * @return true if the transaction is associated to an account
+	 */
+	public boolean isTransactionAssociatedToAccount(String transactionId, String accountId) {
+		return transactionRepository.isTransactionAssociatedToAccount(transactionId, accountId);
+	}
+	
 	/**
 	 * Map {@link Transaction} to {@link TransactionResponse}
 	 * 
